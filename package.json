@@ -1,0 +1,18 @@
+{
+  "name": "cocoarena",
+  "version": "1.0.0",
+  "description": "COCOARENA - Leading Coconut Merchant Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": [
+    "coconut",
+    "billing",
+    "agro-merchant",
+    "cocoarena"
+  ],
+  "author": "COCOARENA",
+  "license": "ISC"
+}

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COCOARENA - Coconut Billing System</title>
+  <meta name="description" content="COCOARENA Billing Platform - Managing bills for VISHNUDATTA COCONUT, SRI KRISHNA COCONUTS, and SRI KRISHNA TRADERS.">
+  
+  <!-- Google Fonts: Cinzel, Outfit, Ramabhadra, Courier Prime -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-body">
+
+  <!-- Scenic Konaseema Coconut Plantation Background -->
+  <div class="scenic-backdrop" style="background-image: url('assets/images/konaseema_bg.jpg');"></div>
+  <div class="scenic-light-overlay"></div>
+
+  <!-- Dashboard App Wrapper -->
+  <div class="dashboard-wrapper">
+
+    <!-- TOP DASHBOARD NAVBAR -->
+    <header class="top-navbar dashboard-navbar" id="dashboard-navbar">
+      <div class="navbar-container">
+        
+        <!-- Left: Brand Title -->
+        <div class="header-brand">
+          <span class="brand-title" id="dash-brand-title">COCOARENA</span>
+          <span class="brand-subtag">COCONUT BILLING PLATFORM</span>
+        </div>
+
+        <!-- Right: Lang Switcher & Logout -->
+        <div class="header-actions">
+          
+          <!-- Bilingual Language Switcher -->
+          <div class="lang-switch-box">
+            <button type="button" class="lang-btn active" id="btn-lang-en" data-lang="en">English</button>
+            <span class="lang-divider">|</span>
+            <button type="button" class="lang-btn" id="btn-lang-te" data-lang="te">తెలుగు</button>
+          </div>
+
+          <!-- Logout Button -->
+          <button type="button" class="btn-logout" id="btn-logout" title="Sign out of account">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span id="text-logout">Logout</span>
+          </button>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dashboard-main">
+      
+      <!-- HERO TABS BAR: EXISTING BILLS & CREATE NEW BILL -->
+      <section class="dash-tabs-container">
+        <div class="dash-tabs-wrapper">
+          
+          <button type="button" class="dash-tab-btn active" id="tab-existing-bills" data-tab="existing">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <div class="tab-text-group">
+              <span class="tab-title" id="text-tab-existing">Existing Bills</span>
+              <span class="tab-subtitle" id="text-tab-existing-sub">Archived Bills & Records</span>
+            </div>
+            <span class="tab-badge" id="badge-existing-count">0</span>
+          </button>
+
+          <button type="button" class="dash-tab-btn" id="tab-create-bill" data-tab="create">
+            <div class="tab-icon">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+            </div>
+            <div class="tab-text-group">
+              <span class="tab-title" id="text-tab-create">Create New Bill</span>
+              <span class="tab-subtitle" id="text-tab-create-sub">3 Coconut Businesses Available</span>
+            </div>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- VIEW 1: EXISTING BILLS ARCHIVE (PERMANENT STORAGE)   -->
+      <!-- ==================================================== -->
+      <section class="tab-pane active" id="pane-existing-bills">
+        
+        <div class="section-card glass-panel">
+          
+          <div class="pane-header-row">
+            <div>
+              <h2 class="pane-title" id="title-existing-bills">Existing Bills Archive</h2>
+              <p class="pane-desc" id="desc-existing-bills">
+                Permanent records for VISHNUDATTA COCONUT, SRI KRISHNA COCONUTS & SRI KRISHNA TRADERS.
+              </p>
+            </div>
+
+            <!-- Search, Sort and Create Action Bar -->
+            <div class="search-filter-box">
+              <div class="search-input-wrap">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input 
+                  type="text" 
+                  id="search-bills-input" 
+                  placeholder="Search by Bill No or Buyer (Messers)..." 
+                  autocomplete="off"
+                >
+              </div>
+
+              <!-- Sorting Dropdown -->
+              <div class="sort-select-wrap">
+                <select id="sort-bills-select" class="sort-bills-select" title="Sort Bills">
+                  <option value="newest">Sort: Newest First</option>
+                  <option value="oldest">Sort: Oldest First</option>
+                  <option value="bill-desc">Sort: Bill No (High to Low)</option>
+                  <option value="bill-asc">Sort: Bill No (Low to High)</option>
+                  <option value="amount-desc">Sort: Grand Total (High to Low)</option>
+                </select>
+              </div>
+
+              <button type="button" class="btn-quick-create" id="btn-quick-new-bill">
+                <span>+ Create New Bill</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Triple Company Filter Bar -->
+          <div class="company-filter-tabs" id="company-filter-tabs">
+            <button type="button" class="btn-company-filter active" data-company="all" id="filter-company-all">
+              <span class="filter-icon">📁</span>
+              <span class="filter-label">All Businesses</span>
+              <span class="filter-pill" id="badge-count-all">0</span>
+            </button>
+            <button type="button" class="btn-company-filter" data-company="VISHNUDATTA COCONUT" id="filter-company-vd">
+              <span class="filter-icon">🌴</span>
+              <span class="filter-label">VISHNUDATTA COCONUT</span>
+              <span class="filter-pill" id="badge-count-vd">0</span>
+            </button>
+            <button type="button" class="btn-company-filter" data-company="SRI KRISHNA COCONUTS" id="filter-company-skc">
+              <span class="filter-icon">🥥</span>
+              <span class="filter-label">SRI KRISHNA COCONUTS</span>
+              <span class="filter-pill" id="badge-count-skc">0</span>
+            </button>
+            <button type="button" class="btn-company-filter" data-company="SRI KRISHNA TRADERS" id="filter-company-skt">
+              <span class="filter-icon">🌾</span>
+              <span class="filter-label">SRI KRISHNA TRADERS</span>
+              <span class="filter-pill" id="badge-count-skt">0</span>
+            </button>
+          </div>
+
+          <!-- Existing Bills Table Container -->
+          <div class="table-responsive-wrapper">
+            <table class="bills-archive-table" id="table-existing-bills">
+              <thead>
+                <tr>
+                  <th id="th-bill-no">Bill No</th>
+                  <th id="th-company">Coconut Trader / Business</th>
+                  <th id="th-date">Date</th>
+                  <th id="th-messers">Goods Sold To (Messers)</th>
+                  <th id="th-total-coconuts">Total Coconuts</th>
+                  <th id="th-grand-total">Grand Total (₹)</th>
+                  <th id="th-actions" style="text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-existing-bills">
+                <!-- Injected dynamically by dashboard.js -->
+              </tbody>
+            </table>
+
+            <!-- Empty State Placeholder -->
+            <div class="empty-bills-state" id="empty-bills-state" style="display: none;">
+              <div class="empty-icon">📁</div>
+              <h3 id="text-empty-title">No bills recorded yet</h3>
+              <p id="text-empty-desc">Click "Create New Bill" above to select a coconut trader and start recording bills.</p>
+              <button type="button" class="btn-gold-action" id="btn-create-first-bill">Create First Bill</button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================================================== -->
+      <!-- VIEW 2: CREATE BILL (SELECT TRADER -> LIVE BILL)     -->
+      <!-- ==================================================== -->
+      <section class="tab-pane" id="pane-create-bill">
+        
+        <!-- STEP 1: TRADER SELECTION VIEW -->
+        <div class="trader-picker-container" id="trader-picker-screen">
+          <div class="trader-picker-header">
+            <span class="trader-step-badge">Step 1 • Select Trader</span>
+            <h2 class="trader-picker-title">Select Coconut Trader</h2>
+            <p class="trader-picker-desc">
+              Choose which business firm you are issuing this bill for. Each company has its exact authentic printed Bill of Supply layout.
+            </p>
+          </div>
+
+          <div class="trader-cards-grid">
+            
+            <!-- Card 1: VISHNUDATTA COCONUT (Picture 2) -->
+            <div class="trader-card trader-card-vd" id="card-select-vd">
+              <div class="trader-card-icon-box">🌴</div>
+              <h3 class="trader-card-name">VISHNUDATTA COCONUT</h3>
+              <span class="trader-card-tag">Coconut Merchants</span>
+              <p class="trader-card-location">
+                PODALADA - 533249, Razole Mandal, Dr. B.R.A. Konaseema Dt., A.P.<br>
+                <strong>Proprietor:</strong> A. SUBRAHMANYAM | <strong>Cell:</strong> 94402 17789
+              </p>
+              <button type="button" class="trader-card-btn" id="btn-select-vd">
+                <span>Issue Bill for VISHNUDATTA</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            <!-- Card 2: SRI KRISHNA COCONUTS (Picture 3) -->
+            <div class="trader-card trader-card-skc" id="card-select-skc">
+              <div class="trader-card-icon-box">🥥</div>
+              <h3 class="trader-card-name">SRI KRISHNA COCONUTS</h3>
+              <span class="trader-card-tag">Coconut Merchants</span>
+              <p class="trader-card-location">
+                No. 19, MALLAPPALLI - 635 854, Natrampalli (Tk), Vellore Dt., Tamilnadu.<br>
+                <strong>Proprietor:</strong> N. Phani | <strong>Phones:</strong> 70134 75653, 9505138152
+              </p>
+              <button type="button" class="trader-card-btn trader-card-btn-skc" id="btn-select-skc">
+                <span>Issue Bill for SRI KRISHNA COCONUTS</span>
+                <span>→</span>
+              </button>
+            </div>
+
+            <!-- Card 3: SRI KRISHNA TRADERS (PDF Page 1) -->
+            <div class="trader-card trader-card-skt" id="card-select-skt">
+              <div class="trader-card-icon-box">🌾</div>
+              <h3 class="trader-card-name">SRI KRISHNA TRADERS</h3>
+              <span class="trader-card-tag">Coconut Merchants</span>
+              <p class="trader-card-location">
+                PODALADA - 533249, Razole Mandal, Dr. B.R.A. Konaseema Dt., A.P.<br>
+                <strong>Proprietor:</strong> N. Phani | <strong>Phones:</strong> 9505138152, 7305138152
+              </p>
+              <button type="button" class="trader-card-btn trader-card-btn-skt" id="btn-select-skt">
+                <span>Issue Bill for SRI KRISHNA TRADERS</span>
+                <span>→</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- STEP 2: INTERACTIVE REAL BILL OF SUPPLY WORKSPACE -->
+        <div class="trader-workspace-container" id="trader-workspace-screen" style="display: none;">
+          
+          <!-- Sticky Action Toolbar -->
+          <div class="bill-doc-toolbar glass-panel">
+            <div class="toolbar-info">
+              <div class="trader-active-pill" id="active-trader-pill">
+                <span id="active-trader-icon">🌴</span>
+                <span id="active-trader-name">VISHNUDATTA COCONUT</span>
+              </div>
+              <button type="button" class="btn-switch-trader" id="btn-change-trader" title="Switch to another coconut trader">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Change Trader</span>
+              </button>
+            </div>
+
+            <div class="toolbar-actions">
+              <button type="button" class="btn-action-save" id="btn-save-bill" title="Save bill to records">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span id="text-btn-save-bill">Save Bill</span>
+              </button>
+
+              <button type="button" class="btn-action-refresh" id="btn-refresh-bill" title="Clear for new entry">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <polyline points="23 20 23 14 17 14"></polyline>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                </svg>
+                <span>Refresh Form</span>
+              </button>
+
+              <button type="button" class="btn-action-download" id="btn-download-bill-pdf" title="Download official Bill of Supply PDF">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download PDF</span>
+              </button>
+
+              <!-- Zoom Controls for Desktop & Mobile -->
+              <div class="toolbar-zoom-group">
+                <button type="button" class="btn-scale" id="btn-zoom-out" title="Zoom Out">-</button>
+                <span class="scale-label" id="label-zoom">100%</span>
+                <button type="button" class="btn-scale" id="btn-zoom-in" title="Zoom In">+</button>
+                <button type="button" class="btn-scale-fit" id="btn-zoom-fit" title="Fit to Screen Width">Fit</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct Physical Bill Sheets Container -->
+          <div class="sheet-scroll-container" id="sheet-scroll-container">
+            
+            <!-- ======================================================== -->
+            <!-- MODEL 1: VISHNUDATTA COCONUT SHEET (EXACT PICTURE 2)     -->
+            <!-- ======================================================== -->
+            <div class="official-bill-sheet sheet-vishnudatta" id="sheet-vishnudatta">
+              
+              <!-- Top Row: HSN, Om Sree Ramulu, BILL OF SUPPLY, Cell -->
+              <div class="bill-top-row">
+                <div class="bill-top-left">HSN Code : 0801</div>
+                <div class="bill-top-center">
+                  <div class="bill-sacred-heading">Om Sree Ramulu</div>
+                  <div class="bill-main-supply-title">BILL OF SUPPLY</div>
+                </div>
+                <div class="bill-top-right">Cell : 94402 17789</div>
+              </div>
+
+              <!-- Big Title & Details -->
+              <div class="bill-company-header">
+                <h1 class="bill-title-red">VISHNUDATTA COCONUT</h1>
+                <h2 class="bill-subtitle-green">COCONUT MERCHANTS</h2>
+                <p class="bill-address-dark">PODALADA - 533249, Razole Mandal, Dr. B.R.A. Konaseema Dt., A.P.</p>
+              </div>
+
+              <!-- License, Proprietor, Lord Balaji & Date/Bill Box -->
+              <div class="bill-mid-grid">
+                <div class="bill-mid-left-col">
+                  <div class="bill-license-text">AMC Licence No. : 01/RZL/KSM/2026-31</div>
+                  <div class="bill-proprietor-red-box">
+                    <span class="prop-lbl">Proprietor</span>
+                    <span class="prop-name">A. SUBRAHMANYAM</span>
+                  </div>
+                </div>
+
+                <div class="bill-mid-emblem-col">
+                  <!-- Authentic Lord Balaji Temple Vigraham Emblem (Picture 2) -->
+                  <div class="temple-emblem-wrap emblem-green">
+                    <img src="assets/images/logo_balaji_vd.png" alt="Lord Venkateswara Balaji" class="bill-center-logo bill-logo-vd">
+                  </div>
+                </div>
+
+                <div class="bill-mid-right-col">
+                  <div class="bill-date-billno-box">
+                    <div class="box-row-date">
+                      <span class="box-tag">DATE :</span>
+                      <input type="text" id="vd-date" class="pen-input pen-bold" placeholder="DD/MM/YYYY">
+                    </div>
+                    <div class="box-row-billno">
+                      <span class="box-tag">BILL No.</span>
+                      <input type="text" id="vd-bill-no" class="pen-input pen-bold pen-red-num" placeholder="e.g. 26">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goods Sold to & Particulars -->
+              <div class="bill-particulars-section">
+                <div class="part-row">
+                  <span class="part-lbl-strong">Goods Sold to :</span>
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">Messers</span>
+                  <input type="text" id="vd-messers" class="pen-input pen-dotted pen-bold pen-cap" placeholder="Buyer / Firm Name & City">
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">GSTIN</span>
+                  <input type="text" id="vd-gstin" class="pen-input pen-dotted" placeholder="GSTIN or Location">
+                </div>
+                <div class="part-row part-multi-flex">
+                  <span class="part-lbl">Despatched on</span>
+                  <input type="text" id="vd-despatched-on" class="pen-input pen-dotted inline-w120">
+                  <span class="part-lbl">by Lorry No.</span>
+                  <input type="text" id="vd-lorry-no" class="pen-input pen-dotted pen-bold inline-w150" placeholder="e.g. KA51 AM 6493">
+                  <span class="part-lbl">Hire/ Freight Rs.</span>
+                  <input type="text" id="vd-hire-freight" class="pen-input pen-dotted inline-w120" placeholder="e.g. 68000/-">
+                </div>
+                <div class="part-row part-multi-flex">
+                  <span class="part-lbl">From</span>
+                  <input type="text" id="vd-from" class="pen-input pen-dotted pen-bold inline-w120" value="PODALADA">
+                  <span class="part-lbl">Direct / Transhipment at</span>
+                  <input type="text" id="vd-transhipment" class="pen-input pen-dotted flex-fill">
+                  <span class="part-lbl">to your place as per</span>
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">your order by Wire/ Phone or in person on</span>
+                  <input type="text" id="vd-order-by" class="pen-input pen-dotted flex-fill" placeholder="Person / Authorized phone details">
+                </div>
+              </div>
+
+              <!-- Main Items Table -->
+              <div class="bill-sheet-table-wrap">
+                <table class="bill-green-table">
+                  <thead>
+                    <tr>
+                      <th class="col-item">Item</th>
+                      <th class="col-quality">Quality<br><span class="th-sub">"BEST WATER COCOANUTS"</span></th>
+                      <th class="col-bags">Loose or<br>Bharthi x Bags</th>
+                      <th class="col-gross">Quantity<br>Gross</th>
+                      <th class="col-rate">Rate</th>
+                      <th class="col-amount" colspan="2">AMOUNT<br><span class="th-rs">Rs.</span> <span class="th-ps">Ps.</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Row 1 -->
+                    <tr>
+                      <td><input type="text" id="vd-item-1" class="pen-input pen-bold" value="Coconuts" placeholder="Damage / Best Coconuts"></td>
+                      <td><input type="text" id="vd-quality-1" class="pen-input" value="BEST WATER COCONUTS"></td>
+                      <td><input type="text" id="vd-bags-1" class="pen-input pen-center" placeholder="100 x 480"></td>
+                      <td><input type="number" id="vd-qty-1" class="pen-input pen-center pen-bold" placeholder="48000"></td>
+                      <td><input type="number" step="0.01" id="vd-rate-1" class="pen-input pen-right pen-bold" placeholder="6.14"></td>
+                      <td class="td-amt-rs"><input type="text" id="vd-amount-rs-1" class="pen-input pen-right pen-bold" placeholder="0"></td>
+                      <td class="td-amt-ps"><input type="text" id="vd-amount-ps-1" class="pen-input pen-center" placeholder="00"></td>
+                    </tr>
+                    <!-- Row 2 -->
+                    <tr>
+                      <td><input type="text" id="vd-item-2" class="pen-input" placeholder="Damage Coconuts"></td>
+                      <td><input type="text" id="vd-quality-2" class="pen-input" placeholder=""></td>
+                      <td><input type="text" id="vd-bags-2" class="pen-input pen-center" placeholder=""></td>
+                      <td><input type="number" id="vd-qty-2" class="pen-input pen-center" placeholder=""></td>
+                      <td><input type="number" step="0.01" id="vd-rate-2" class="pen-input pen-right" placeholder=""></td>
+                      <td class="td-amt-rs"><input type="text" id="vd-amount-rs-2" class="pen-input pen-right" placeholder=""></td>
+                      <td class="td-amt-ps"><input type="text" id="vd-amount-ps-2" class="pen-input pen-center" placeholder=""></td>
+                    </tr>
+                    <!-- Row 3 (Extra space row like real paper) -->
+                    <tr class="blank-fill-row">
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td class="td-amt-rs"></td>
+                      <td class="td-amt-ps"></td>
+                    </tr>
+                    <!-- Total Row -->
+                    <tr class="table-total-row">
+                      <td colspan="2" class="td-total-lbl">TOTAL</td>
+                      <td><input type="text" id="vd-total-bags" class="pen-input pen-center pen-bold" placeholder="480"></td>
+                      <td><input type="text" id="vd-total-qty" class="pen-input pen-center pen-bold" placeholder="48000"></td>
+                      <td></td>
+                      <td colspan="2" class="td-slash-col"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Calculations & Bank Details Section -->
+              <div class="bill-lower-split-grid">
+                
+                <!-- Left: Bank Box & Ganesha -->
+                <div class="lower-left-col">
+                  <div class="bill-bank-red-box">
+                    <div class="bank-line-title">PLEASE SEND PAYMENT</div>
+                    <div class="bank-line-branch">S.B.I., RAZOLE ONLY</div>
+                    <div class="bank-line-code">RTGS CODE : SBIN0000910</div>
+                    <div class="bank-line-ac">A/c. No. : 45088363898</div>
+                  </div>
+
+                  <!-- Authentic Lord Ganesha Emblem (Picture 2) -->
+                  <div class="ganesha-emblem-wrap">
+                    <img src="assets/images/logo_ganesha_vd.png" alt="Lord Ganesha" class="bill-ganesha-logo">
+                  </div>
+
+                  <div class="gst-exempt-notice">
+                    COCONUTS ARE EXEMPTED FROM LEVY OF GST AS FOR ENTRY '47' OF SCHEDULE I OF THE CGST ACT.
+                  </div>
+                </div>
+
+                <!-- Right: Calculations Breakdown -->
+                <div class="lower-right-col">
+                  <div class="calc-table">
+                    <div class="calc-row">
+                      <span class="calc-lbl">Actual Cost of the Cocoanuts :</span>
+                      <input type="text" id="vd-actual-cost" class="pen-input pen-right pen-bold" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Grading Charges 1% :</span>
+                      <input type="text" id="vd-grading-charges" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Expenses......................... :</span>
+                      <input type="text" id="vd-expenses" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Commission :</span>
+                      <input type="text" id="vd-commission" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Transit Insurance :</span>
+                      <input type="text" id="vd-insurance" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    
+                    <div class="calc-divider"></div>
+
+                    <div class="calc-row">
+                      <span class="calc-lbl">Lorry advance of Cash paid in your account :</span>
+                      <input type="text" id="vd-lorry-advance" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+
+                    <div class="calc-row calc-row-grand">
+                      <span class="calc-lbl-grand">GRAND TOTAL</span>
+                      <input type="text" id="vd-grand-total" class="pen-input pen-right pen-bold pen-grand-num" placeholder="0.00">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Rupees in Words -->
+              <div class="bill-words-section">
+                <div class="words-line">
+                  <span class="words-lbl">Rupees</span>
+                  <input type="text" id="vd-words-rupees" class="pen-input pen-dotted pen-bold flex-fill" placeholder="Amount in words">
+                </div>
+                <div class="words-line">
+                  <span class="words-lbl">and paise</span>
+                  <input type="text" id="vd-words-paise" class="pen-input pen-dotted inline-w150" placeholder="Zero">
+                  <span class="words-lbl">only which please credit to our account.</span>
+                </div>
+              </div>
+
+              <!-- Terms & Conditions -->
+              <div class="bill-terms-red">
+                1. Goods are purchased and despatched for you at your risk as per your order and instructions. 2. Terms Ex-godown. Any disputes on quantity or quality will not be entertained after the goods leave our premises. 3. Payment should be sent within Two days from the date of despatch of goods. 4. Interest payable at 24% P.A. if not paid within ten days from the date of bill 5. Subject to RAZOLE jurisdiction.
+              </div>
+
+              <!-- Signatures Row -->
+              <div class="bill-signatures-grid">
+                <div class="sig-left">
+                  <input type="text" id="vd-buyer-phone" class="pen-input pen-dotted pen-center inline-w200" placeholder="Phone No. if any">
+                  <div class="sig-title">Buyer or his Representative - If any Person</div>
+                </div>
+                <div class="sig-right">
+                  <div class="sig-firm-for">For. Vishnudatta Coconut</div>
+                  <input type="text" id="vd-seller-sign" class="pen-input pen-handwriting pen-right" value="A. SUBRAHMANYAM">
+                  <div class="sig-title">Seller</div>
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- ======================================================== -->
+            <!-- MODEL 2: SRI KRISHNA COCONUTS SHEET (EXACT PICTURE 3)    -->
+            <!-- ======================================================== -->
+            <div class="official-bill-sheet sheet-srikrishna-coconuts" id="sheet-srikrishna-coconuts" style="display: none;">
+              
+              <!-- Top Row: Lord Balaji (Left), HSN, BILL OF SUPPLY, Phones, Ganesha (Right) -->
+              <div class="bill-top-row">
+                <div class="top-row-left-group">
+                  <div class="temple-emblem-wrap emblem-red mini-emblem">
+                    <img src="assets/images/logo_balaji_skc.png" alt="Balaji" class="bill-mini-corner-logo">
+                  </div>
+                  <div class="bill-top-left">HSN Code : 0801</div>
+                </div>
+                <div class="bill-top-center">
+                  <div class="bill-sacred-heading">Om Sree Ramulu</div>
+                  <div class="bill-main-supply-title">BILL OF SUPPLY</div>
+                </div>
+                <div class="top-row-right-group">
+                  <div class="bill-top-phones-skc">
+                    Phani : 70134 75653<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9505138152
+                  </div>
+                  <div class="ganesha-emblem-wrap mini-emblem">
+                    <img src="assets/images/logo_ganesha_vd.png" alt="Ganesha" class="bill-mini-corner-logo">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Big Title & Details -->
+              <div class="bill-company-header">
+                <h1 class="bill-title-red">SRI KRISHNA COCONUTS</h1>
+                <h2 class="bill-subtitle-green">COCONUT MERCHANTS</h2>
+                <p class="bill-address-dark">No. 19, MALLAPPALLI - 635 854, Natrampalli (Tk), Vellore Dt., Tamilnadu.</p>
+              </div>
+
+              <!-- Proprietor, Balaji Center, & 3-Line Box (Date, Lorry No, Lorry Hire) -->
+              <div class="bill-mid-grid skc-mid-grid">
+                <div class="bill-mid-left-col">
+                  <div class="skc-proprietor-text">
+                    <span class="prop-red">Proprietor :</span> <span class="prop-cursive">N. Phani</span>
+                  </div>
+                  <div class="skc-billno-box">
+                    <span class="box-tag">BILL No.</span>
+                    <input type="text" id="skc-bill-no" class="pen-input pen-bold pen-red-num" placeholder="e.g. 68">
+                  </div>
+                </div>
+
+                <div class="bill-mid-emblem-col">
+                  <!-- Authentic Lord Balaji Emblem (Picture 3) -->
+                  <div class="temple-emblem-wrap emblem-red">
+                    <img src="assets/images/logo_balaji_skc.png" alt="Lord Venkateswara Balaji" class="bill-center-logo bill-logo-skc">
+                  </div>
+                </div>
+
+                <div class="bill-mid-right-col">
+                  <!-- The Exact 3-Row Box in Picture 3 -->
+                  <div class="skc-3row-box">
+                    <div class="box-3row-item">
+                      <span class="box-tag">DATE :</span>
+                      <input type="text" id="skc-date" class="pen-input pen-bold" placeholder="16/10/2026">
+                    </div>
+                    <div class="box-3row-item">
+                      <span class="box-tag">Lorry No :</span>
+                      <input type="text" id="skc-lorry-no" class="pen-input pen-bold" placeholder="AP39TM 9889">
+                    </div>
+                    <div class="box-3row-item">
+                      <span class="box-tag">Lorry Hire :</span>
+                      <input type="text" id="skc-lorry-hire" class="pen-input pen-bold" placeholder="127400/-">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goods Sold to & Particulars -->
+              <div class="bill-particulars-section">
+                <div class="part-row">
+                  <span class="part-lbl-strong">Goods Sold to :</span>
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">Messers</span>
+                  <input type="text" id="skc-messers" class="pen-input pen-dotted pen-bold pen-cap" placeholder="DOCTOR FRUIT COMPANY">
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">GSTIN</span>
+                  <input type="text" id="skc-gstin" class="pen-input pen-dotted" placeholder="KANPUR UP">
+                </div>
+                <div class="part-row part-multi-flex">
+                  <span class="part-lbl">Despatched on</span>
+                  <input type="text" id="skc-despatched-on" class="pen-input pen-dotted inline-w150" placeholder="03/10/2026">
+                  <span class="part-lbl">From</span>
+                  <input type="text" id="skc-from" class="pen-input pen-dotted pen-bold flex-fill" placeholder="MEDICHARLAPALEM">
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">Direct / Transhipment at</span>
+                  <input type="text" id="skc-transhipment" class="pen-input pen-dotted inline-w150">
+                  <span class="part-lbl">to your place as per your order by Phone or in person on</span>
+                  <input type="text" id="skc-order-by" class="pen-input pen-dotted flex-fill" placeholder="Phani">
+                </div>
+              </div>
+
+              <!-- Main Table -->
+              <div class="bill-sheet-table-wrap">
+                <table class="bill-green-table">
+                  <thead>
+                    <tr>
+                      <th class="col-item">Item</th>
+                      <th class="col-quality">Quality<br><span class="th-sub">"BEST WATER COCOANUTS"</span></th>
+                      <th class="col-bags">Loose or<br>Bharthi x Bags</th>
+                      <th class="col-gross">Quantity<br>Gross</th>
+                      <th class="col-rate">Rate</th>
+                      <th class="col-amount" colspan="2">AMOUNT<br><span class="th-rs">Rs.</span> <span class="th-ps">Ps.</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="skc-item-1" class="pen-input pen-bold" value="Best water coconuts (G.B. GUNNYS)"></td>
+                      <td><input type="text" id="skc-quality-1" class="pen-input" value="BEST WATER COCONUTS"></td>
+                      <td><input type="text" id="skc-bags-1" class="pen-input pen-center" placeholder="50 x 707"></td>
+                      <td><input type="number" id="skc-qty-1" class="pen-input pen-center pen-bold" placeholder="35350"></td>
+                      <td><input type="number" step="0.01" id="skc-rate-1" class="pen-input pen-right pen-bold" placeholder="24.30"></td>
+                      <td class="td-amt-rs"><input type="text" id="skc-amount-rs-1" class="pen-input pen-right pen-bold" placeholder="842161"></td>
+                      <td class="td-amt-ps"><input type="text" id="skc-amount-ps-1" class="pen-input pen-center" placeholder="00"></td>
+                    </tr>
+                    <tr class="blank-fill-row">
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td class="td-amt-rs"></td>
+                      <td class="td-amt-ps"></td>
+                    </tr>
+                    <tr class="table-total-row">
+                      <td colspan="2" class="td-total-lbl">TOTAL</td>
+                      <td><input type="text" id="skc-total-bags" class="pen-input pen-center pen-bold" placeholder="707"></td>
+                      <td><input type="text" id="skc-total-qty" class="pen-input pen-center pen-bold" placeholder="35350"></td>
+                      <td></td>
+                      <td colspan="2" class="td-slash-col"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Lower Section: Bank Bargur & Picture 3 Calculations -->
+              <div class="bill-lower-split-grid">
+                
+                <div class="lower-left-col">
+                  <!-- SBI Bargur Box -->
+                  <div class="bill-bank-red-box">
+                    <div class="bank-line-title">PLEASE SEND PAYMENT TO</div>
+                    <div class="bank-line-branch">S.B.I., BARGUR</div>
+                    <div class="bank-line-code">IFSC/ RTGS CODE : SBIN0017939</div>
+                    <div class="bank-line-ac">A/c. No. : 42365925418</div>
+                  </div>
+
+                  <div class="gst-exempt-notice">
+                    COCONUTS ARE EXEMPTED FROM LEVY OF GST AS FOR ENTRY '47' OF SCHEDULE I OF THE CGST ACT.
+                  </div>
+                </div>
+
+                <!-- Right Calculations (Exact Picture 3 Breakdown) -->
+                <div class="lower-right-col">
+                  <div class="calc-table">
+                    <div class="calc-row">
+                      <span class="calc-lbl">Actual Cost of the Cocoanuts :</span>
+                      <input type="text" id="skc-actual-cost" class="pen-input pen-right pen-bold" placeholder="842161.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Grading Charges 1% :</span>
+                      <input type="text" id="skc-grading-charges" class="pen-input pen-right" placeholder="8421.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Packing Material :</span>
+                      <input type="text" id="skc-packing-material" class="pen-input pen-right" placeholder="12726.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Overhead charges :</span>
+                      <input type="text" id="skc-overhead-charges" class="pen-input pen-right" placeholder="22977.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Phones, Telegrams & Postage :</span>
+                      <input type="text" id="skc-postage" class="pen-input pen-right" placeholder="100.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Commission :</span>
+                      <input type="text" id="skc-commission" class="pen-input pen-right" placeholder="2500.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Transit Insurance :</span>
+                      <input type="text" id="skc-insurance" class="pen-input pen-right" placeholder="2831.00">
+                    </div>
+
+                    <div class="calc-divider"></div>
+
+                    <div class="calc-row">
+                      <span class="calc-lbl">Lorry advance of Cash paid in your account :</span>
+                      <input type="text" id="skc-lorry-advance" class="pen-input pen-right" placeholder="57400.00">
+                    </div>
+
+                    <div class="calc-row calc-row-grand">
+                      <span class="calc-lbl-grand">GRAND TOTAL</span>
+                      <input type="text" id="skc-grand-total" class="pen-input pen-right pen-bold pen-grand-num" placeholder="949116.00">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Words -->
+              <div class="bill-words-section">
+                <div class="words-line">
+                  <span class="words-lbl">Rupees</span>
+                  <input type="text" id="skc-words-rupees" class="pen-input pen-dotted pen-bold flex-fill" placeholder="Nine lakhs forty nine thousand one hundred sixteen">
+                </div>
+                <div class="words-line">
+                  <span class="words-lbl">and paise</span>
+                  <input type="text" id="skc-words-paise" class="pen-input pen-dotted inline-w150" placeholder="Zero">
+                  <span class="words-lbl">only which please credit to our account.</span>
+                </div>
+              </div>
+
+              <!-- Terms with Mummidivaram Jurisdiction -->
+              <div class="bill-terms-red">
+                1. Goods are purchased and despatched for you at your risk as per your order and instructions. 2. Terms Ex-godown. Any disputes on quantity or quality will not be entertained after the goods leave our premises. 3. Payment should be sent within Two days from the date of despatch of goods. 4. Interest payable at 24% P.A. if not paid within ten days from the date of bill 5. Subject to Mummidivaram jurisdiction.
+              </div>
+
+              <!-- Signatures -->
+              <div class="bill-signatures-grid">
+                <div class="sig-left">
+                  <div class="sig-blank-touch"></div>
+                  <div class="sig-title">Buyer or his Representative - If any Person</div>
+                </div>
+                <div class="sig-right">
+                  <div class="sig-firm-for">For. Sri Krishna Coconuts</div>
+                  <input type="text" id="skc-seller-sign" class="pen-input pen-handwriting pen-right" value="S. V. M.">
+                  <div class="sig-title">Seller</div>
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- ======================================================== -->
+            <!-- MODEL 3: SRI KRISHNA TRADERS SHEET (EXACT PDF PAGE 1)    -->
+            <!-- ======================================================== -->
+            <div class="official-bill-sheet sheet-srikrishna-traders" id="sheet-srikrishna-traders" style="display: none;">
+              
+              <!-- Top Row: HSN Code, BILL OF SUPPLY, Phones -->
+              <div class="bill-top-row">
+                <div class="bill-top-left">HSN Code : 0801</div>
+                <div class="bill-top-center">
+                  <div class="bill-main-supply-title">BILL OF SUPPLY</div>
+                </div>
+                <div class="bill-top-right">
+                  Phani : 9505138152<br>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7305138152
+                </div>
+              </div>
+
+              <!-- Big Patterned Title & Details -->
+              <div class="bill-company-header">
+                <h1 class="bill-title-pattern-red">SRI KRISHNA TRADERS</h1>
+                <h2 class="bill-subtitle-green">COCONUT MERCHANTS</h2>
+                <p class="bill-address-dark">PODALADA - 533249, Razole Mandal, Dr. B.R.A. Konaseema Dt., A.P.</p>
+              </div>
+
+              <!-- License (Left), Balaji (Center), Prop (Right) -->
+              <div class="skt-subhead-row">
+                <div class="skt-licence">AMC Licence No. : 2026/20009561/50009371</div>
+                <div class="skt-prop">Prop : <em>N. Phani</em></div>
+              </div>
+
+              <!-- Red Stacked Boxes Grid -->
+              <div class="skt-boxes-grid">
+                <!-- Left Box: Date & Bill No -->
+                <div class="skt-box skt-box-left">
+                  <div class="skt-box-row">
+                    <span class="box-tag">DATE :</span>
+                    <input type="text" id="skt-date" class="pen-input pen-bold" placeholder="DD/MM/YYYY">
+                  </div>
+                  <div class="skt-box-row">
+                    <span class="box-tag">Bill No.</span>
+                    <input type="text" id="skt-bill-no" class="pen-input pen-bold pen-red-num" placeholder="e.g. 101">
+                  </div>
+                </div>
+
+                <!-- Center Authentic Lord Balaji Emblem (PDF Page 1) -->
+                <div class="skt-box-center-emblem">
+                  <div class="temple-emblem-wrap emblem-red">
+                    <img src="assets/images/logo_balaji_skt.png" alt="Lord Venkateswara Balaji" class="bill-center-logo bill-logo-skt">
+                  </div>
+                </div>
+
+                <!-- Right Box: Lorry No & Lorry Hire -->
+                <div class="skt-box skt-box-right">
+                  <div class="skt-box-row">
+                    <span class="box-tag">Lorry No :</span>
+                    <input type="text" id="skt-lorry-no" class="pen-input pen-bold" placeholder="e.g. AP37 TE 1234">
+                  </div>
+                  <div class="skt-box-row">
+                    <span class="box-tag">Lorry Hire :</span>
+                    <input type="text" id="skt-lorry-hire" class="pen-input pen-bold" placeholder="Freight amount">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Goods Sold to & Particulars -->
+              <div class="bill-particulars-section">
+                <div class="part-row">
+                  <span class="part-lbl-strong">Goods Sold to :</span>
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">Messers</span>
+                  <input type="text" id="skt-messers" class="pen-input pen-dotted pen-bold pen-cap" placeholder="Buyer / Firm Name">
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">GSTIN</span>
+                  <input type="text" id="skt-gstin" class="pen-input pen-dotted" placeholder="GSTIN No.">
+                </div>
+                <div class="part-row part-multi-flex">
+                  <span class="part-lbl">Despatched on</span>
+                  <input type="text" id="skt-despatched-on" class="pen-input pen-dotted inline-w120">
+                  <span class="part-lbl">by Lorry No.</span>
+                  <input type="text" id="skt-lorry-no-line" class="pen-input pen-dotted pen-bold inline-w150">
+                  <span class="part-lbl">Hire/ Freight Rs.</span>
+                  <input type="text" id="skt-hire-freight" class="pen-input pen-dotted inline-w120">
+                </div>
+                <div class="part-row part-multi-flex">
+                  <span class="part-lbl">From</span>
+                  <input type="text" id="skt-from" class="pen-input pen-dotted pen-bold inline-w120" value="PODALADA">
+                  <span class="part-lbl">Direct / Transhipment at</span>
+                  <input type="text" id="skt-transhipment" class="pen-input pen-dotted flex-fill">
+                  <span class="part-lbl">to your place as per</span>
+                </div>
+                <div class="part-row">
+                  <span class="part-lbl">your order by Wire/ Phone or in person on</span>
+                  <input type="text" id="skt-order-by" class="pen-input pen-dotted flex-fill">
+                </div>
+              </div>
+
+              <!-- Main Table -->
+              <div class="bill-sheet-table-wrap">
+                <table class="bill-green-table">
+                  <thead>
+                    <tr>
+                      <th class="col-item">Item</th>
+                      <th class="col-quality">Quality<br><span class="th-sub">"BEST WATER COCOANUTS"</span></th>
+                      <th class="col-bags">Loose or<br>Bharthi x Bags</th>
+                      <th class="col-gross">Quantity<br>Gross</th>
+                      <th class="col-rate">Rate</th>
+                      <th class="col-amount" colspan="2">AMOUNT<br><span class="th-rs">Rs.</span> <span class="th-ps">Ps.</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="skt-item-1" class="pen-input pen-bold" value="COCONUTS"></td>
+                      <td><input type="text" id="skt-quality-1" class="pen-input" value="BEST WATER COCONUTS"></td>
+                      <td><input type="text" id="skt-bags-1" class="pen-input pen-center" placeholder="100 x 400"></td>
+                      <td><input type="number" id="skt-qty-1" class="pen-input pen-center pen-bold" placeholder="40000"></td>
+                      <td><input type="number" step="0.01" id="skt-rate-1" class="pen-input pen-right pen-bold" placeholder="18.50"></td>
+                      <td class="td-amt-rs"><input type="text" id="skt-amount-rs-1" class="pen-input pen-right pen-bold" placeholder="0"></td>
+                      <td class="td-amt-ps"><input type="text" id="skt-amount-ps-1" class="pen-input pen-center" placeholder="00"></td>
+                    </tr>
+                    <tr class="blank-fill-row">
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td class="td-amt-rs"></td>
+                      <td class="td-amt-ps"></td>
+                    </tr>
+                    <tr class="table-total-row">
+                      <td colspan="2" class="td-total-lbl">TOTAL</td>
+                      <td><input type="text" id="skt-total-bags" class="pen-input pen-center pen-bold"></td>
+                      <td><input type="text" id="skt-total-qty" class="pen-input pen-center pen-bold"></td>
+                      <td></td>
+                      <td colspan="2" class="td-slash-col"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Lower Section: SBI Razole A/c 38723154889 & Calculations -->
+              <div class="bill-lower-split-grid">
+                
+                <div class="lower-left-col">
+                  <!-- Red Box for SBI Razole -->
+                  <div class="bill-bank-red-box">
+                    <div class="bank-line-title">PLEASE SEND PAYMENT TO</div>
+                    <div class="bank-line-branch">S.B.I., RAZOLE</div>
+                    <div class="bank-line-code">RTGS CODE : SBIN0000910</div>
+                    <div class="bank-line-ac">A/c. No. : 38723154889</div>
+                  </div>
+
+                  <div class="ganesha-emblem-wrap">
+                    <img src="assets/images/logo_ganesha_vd.png" alt="Lord Ganesha" class="bill-ganesha-logo">
+                  </div>
+
+                  <div class="gst-exempt-notice">
+                    COCONUTS ARE EXEMPTED FROM LEVY OF GST AS FOR ENTRY '47' OF SCHEDULE I OF THE CGST ACT.
+                  </div>
+                </div>
+
+                <!-- Right Calculations -->
+                <div class="lower-right-col">
+                  <div class="calc-table">
+                    <div class="calc-row">
+                      <span class="calc-lbl">Actual Cost of the Cocoanuts :</span>
+                      <input type="text" id="skt-actual-cost" class="pen-input pen-right pen-bold" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Grading Charges 1% :</span>
+                      <input type="text" id="skt-grading-charges" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Expenses................................. :</span>
+                      <input type="text" id="skt-expenses" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Commission :</span>
+                      <input type="text" id="skt-commission" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+                    <div class="calc-row">
+                      <span class="calc-lbl">Transit Insurance :</span>
+                      <input type="text" id="skt-insurance" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+
+                    <div class="calc-divider"></div>
+
+                    <div class="calc-row">
+                      <span class="calc-lbl">Lorry advance of Cash paid in your account :</span>
+                      <input type="text" id="skt-lorry-advance" class="pen-input pen-right" placeholder="0.00">
+                    </div>
+
+                    <div class="calc-row calc-row-grand">
+                      <span class="calc-lbl-grand">GRAND TOTAL</span>
+                      <input type="text" id="skt-grand-total" class="pen-input pen-right pen-bold pen-grand-num" placeholder="0.00">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Words -->
+              <div class="bill-words-section">
+                <div class="words-line">
+                  <span class="words-lbl">Rupees</span>
+                  <input type="text" id="skt-words-rupees" class="pen-input pen-dotted pen-bold flex-fill" placeholder="Amount in words">
+                </div>
+                <div class="words-line">
+                  <span class="words-lbl">and paise</span>
+                  <input type="text" id="skt-words-paise" class="pen-input pen-dotted inline-w150" placeholder="Zero">
+                  <span class="words-lbl">only which please credit to our account.</span>
+                </div>
+              </div>
+
+              <!-- Terms with Razole Jurisdiction -->
+              <div class="bill-terms-red">
+                1. Goods are purchased and despatched for you at your risk as per your order and instructions. 2. Terms Ex-godown. Any disputes on quantity or quality will not be entertained after the goods leave our premises. 3. Payment should be sent within Two days from the date of despatch of goods. 4. Interest payable at 24% P.A. if not paid within ten days from the date of bill 5. Subject to RAZOLE jurisdiction.
+              </div>
+
+              <!-- Signatures -->
+              <div class="bill-signatures-grid">
+                <div class="sig-left">
+                  <div class="sig-blank-touch"></div>
+                  <div class="sig-title">Buyer or his Representative - if any Person</div>
+                </div>
+                <div class="sig-right">
+                  <div class="sig-firm-for">For. Sri Krishna Traders</div>
+                  <input type="text" id="skt-seller-sign" class="pen-input pen-handwriting pen-right" value="N. Phani">
+                  <div class="sig-title">Seller</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- DOWNSIDE ACTION TOOLBAR (Bottom of Bill Editor) -->
+          <div class="bill-doc-toolbar bill-bottom-toolbar glass-panel" id="bill-bottom-toolbar">
+            <div class="toolbar-info">
+              <button type="button" class="btn-switch-trader" id="btn-bottom-change-trader" title="Switch to another coconut trader">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Change Trader</span>
+              </button>
+              <button type="button" class="btn-scroll-top" id="btn-bottom-scroll-top" title="Scroll back to top of bill">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                <span>Back to Top</span>
+              </button>
+            </div>
+
+            <div class="toolbar-actions">
+              <button type="button" class="btn-action-save" id="btn-bottom-save-bill" title="Save bill to records">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>Save Bill</span>
+              </button>
+
+              <button type="button" class="btn-action-refresh" id="btn-bottom-refresh-bill" title="Clear for new entry">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="1 4 1 10 7 10"></polyline>
+                  <polyline points="23 20 23 14 17 14"></polyline>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                </svg>
+                <span>Refresh Form</span>
+              </button>
+
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- VIEW / PRINT BILL MODAL (For existing bills) -->
+  <div class="bill-modal-overlay" id="bill-modal-overlay">
+    <div class="bill-modal-window">
+      <div class="modal-top-bar">
+        <div class="modal-title-wrap">
+          <h3 id="modal-bill-title">View Bill of Supply</h3>
+          <span id="modal-bill-meta">#101</span>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-modal-print" id="btn-modal-print">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"></polyline>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+              <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print Bill / PDF
+          </button>
+          <button type="button" class="btn-modal-close" id="btn-modal-close" aria-label="Close modal">&times;</button>
+        </div>
+      </div>
+      <div class="modal-sheet-viewport" id="modal-sheet-viewport">
+        <!-- Rendered sheet inserted dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts: Word Docx Generator, Bilingual support, HTML2PDF, Dashboard Logic -->
+  <script src="api-config.js"></script>
+  <script src="assets/js/docx.umd.js"></script>
+  <script src="lang.js"></script>
+  <script src="assets/js/html2pdf.bundle.min.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
