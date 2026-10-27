@@ -9,10 +9,30 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================
-  // 1. Session & Storage Keys
+  // 1. Session Verification & Access Protection
   // ==========================================================
   const STORAGE_USER_KEY = 'vishnudatta_active_user';
+  const STORAGE_TOKEN_KEY = 'vishnudatta_auth_token';
   const STORAGE_BILLS_KEY = 'cocoarena_saved_bills';
+
+  const rawUserSession = localStorage.getItem(STORAGE_USER_KEY);
+  if (!rawUserSession) {
+    // Unauthorized access blocked: Redirect immediately to index.html
+    window.location.replace('index.html?unauthorized=1');
+    return;
+  }
+
+  let activeUser = null;
+  try {
+    activeUser = JSON.parse(rawUserSession);
+    if (!activeUser || (!activeUser.username && !activeUser.fullname)) {
+      throw new Error('Invalid session payload');
+    }
+  } catch (e) {
+    localStorage.removeItem(STORAGE_USER_KEY);
+    window.location.replace('index.html?unauthorized=1');
+    return;
+  }
 
   let currentActiveTrader = 'VISHNUDATTA COCONUT';
   let currentEditingBillId = null;
@@ -74,70 +94,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================
-  // 2. Tab Navigation: Existing Bills vs Create New Bill
+  // 2. DOM Elements & Multi-Trader Screen Elements
   // ==========================================================
   const tabExistingBills = document.getElementById('tab-existing-bills');
   const tabCreateBill = document.getElementById('tab-create-bill');
   const paneExistingBills = document.getElementById('pane-existing-bills');
   const paneCreateBill = document.getElementById('pane-create-bill');
 
-  function switchTab(tabKey) {
-    if (tabKey === 'existing') {
-      if (traderWorkspaceScreen) traderWorkspaceScreen.classList.remove('is-fullpage');
-      tabExistingBills.classList.add('active');
-      tabCreateBill.classList.remove('active');
-      paneExistingBills.classList.add('active');
-      paneCreateBill.classList.remove('active');
-      renderBillsTable();
-    } else {
-      tabCreateBill.classList.add('active');
-      tabExistingBills.classList.remove('active');
-      paneCreateBill.classList.add('active');
-      paneExistingBills.classList.remove('active');
-      // Default to trader selection step if no active trader selected
-      if (!currentEditingBillId && !currentActiveTrader) {
-        showTraderSelectionStep();
-      }
-    }
-  }
-
-  if (tabExistingBills) tabExistingBills.addEventListener('click', () => switchTab('existing'));
-  if (tabCreateBill) tabCreateBill.addEventListener('click', () => switchTab('create'));
-
-  const btnQuickNewBill = document.getElementById('btn-quick-new-bill');
-  if (btnQuickNewBill) {
-    btnQuickNewBill.addEventListener('click', () => {
-      showTraderSelectionStep();
-      switchTab('create');
-    });
-  }
-
-  const btnCreateFirstBill = document.getElementById('btn-create-first-bill');
-  if (btnCreateFirstBill) {
-    btnCreateFirstBill.addEventListener('click', () => {
-      showTraderSelectionStep();
-      switchTab('create');
-    });
-  }
-
-  // Logout button
-  const btnLogout = document.getElementById('btn-logout');
-  if (btnLogout) {
-    btnLogout.addEventListener('click', () => {
-      localStorage.removeItem(STORAGE_USER_KEY);
-      window.location.href = 'index.html';
-    });
-  }
-
-  // ==========================================================
-  // 3. Multi-Trader Selection (Step 1 -> Step 2)
-  // ==========================================================
   const traderPickerScreen = document.getElementById('trader-picker-screen');
   const traderWorkspaceScreen = document.getElementById('trader-workspace-screen');
   const activeTraderPill = document.getElementById('active-trader-pill');
   const activeTraderIcon = document.getElementById('active-trader-icon');
   const activeTraderName = document.getElementById('active-trader-name');
   const btnChangeTrader = document.getElementById('btn-change-trader');
+  const btnBackToExisting = document.getElementById('btn-back-to-existing');
 
   const cardSelectVd = document.getElementById('card-select-vd');
   const btnSelectVd = document.getElementById('btn-select-vd');
@@ -150,6 +120,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const sheetSriKrishnaCoconuts = document.getElementById('sheet-srikrishna-coconuts');
   const sheetSriKrishnaTraders = document.getElementById('sheet-srikrishna-traders');
 
+  // ==========================================================
+  // 3. Multi-Trader Selection & Screen Transitions
+  // ==========================================================
   function showTraderSelectionStep() {
     if (traderWorkspaceScreen) {
       traderWorkspaceScreen.classList.remove('is-fullpage');
@@ -158,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (traderPickerScreen) {
       traderPickerScreen.style.display = 'block';
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function selectTrader(traderKey, isEdit = false) {
@@ -176,21 +150,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (traderKey === 'VISHNUDATTA COCONUT') {
-      activeTraderIcon.textContent = '🌴';
-      activeTraderName.textContent = 'VISHNUDATTA COCONUT';
-      activeTraderPill.className = 'trader-active-pill pill-vd';
+      if (activeTraderIcon) activeTraderIcon.textContent = '🌴';
+      if (activeTraderName) activeTraderName.textContent = 'VISHNUDATTA COCONUT';
+      if (activeTraderPill) activeTraderPill.className = 'trader-active-pill pill-vd';
       if (sheetVishnudatta) sheetVishnudatta.style.display = 'block';
       if (!isEdit) initVishnudattaSheet();
     } else if (traderKey === 'SRI KRISHNA COCONUTS') {
-      activeTraderIcon.textContent = '🥥';
-      activeTraderName.textContent = 'SRI KRISHNA COCONUTS';
-      activeTraderPill.className = 'trader-active-pill pill-sk';
+      if (activeTraderIcon) activeTraderIcon.textContent = '🥥';
+      if (activeTraderName) activeTraderName.textContent = 'SRI KRISHNA COCONUTS';
+      if (activeTraderPill) activeTraderPill.className = 'trader-active-pill pill-sk';
       if (sheetSriKrishnaCoconuts) sheetSriKrishnaCoconuts.style.display = 'block';
       if (!isEdit) initSriKrishnaCoconutsSheet();
     } else if (traderKey === 'SRI KRISHNA TRADERS') {
-      activeTraderIcon.textContent = '🌾';
-      activeTraderName.textContent = 'SRI KRISHNA TRADERS';
-      activeTraderPill.className = 'trader-active-pill pill-skt';
+      if (activeTraderIcon) activeTraderIcon.textContent = '🌾';
+      if (activeTraderName) activeTraderName.textContent = 'SRI KRISHNA TRADERS';
+      if (activeTraderPill) activeTraderPill.className = 'trader-active-pill pill-skt';
       if (sheetSriKrishnaTraders) sheetSriKrishnaTraders.style.display = 'block';
       if (!isEdit) initSriKrishnaTradersSheet();
     }
@@ -198,6 +172,55 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isEdit) {
       showToast(`Selected: ${traderKey}`, 'success');
     }
+  }
+
+  function switchTab(tabKey) {
+    if (tabKey === 'existing') {
+      if (traderWorkspaceScreen) {
+        traderWorkspaceScreen.classList.remove('is-fullpage');
+        traderWorkspaceScreen.style.display = 'none';
+      }
+      if (traderPickerScreen) {
+        traderPickerScreen.style.display = 'none';
+      }
+      if (tabExistingBills) tabExistingBills.classList.add('active');
+      if (tabCreateBill) tabCreateBill.classList.remove('active');
+      if (paneExistingBills) paneExistingBills.classList.add('active');
+      if (paneCreateBill) paneCreateBill.classList.remove('active');
+      renderBillsTable();
+    } else {
+      if (tabCreateBill) tabCreateBill.classList.add('active');
+      if (tabExistingBills) tabExistingBills.classList.remove('active');
+      if (paneCreateBill) paneCreateBill.classList.add('active');
+      if (paneExistingBills) paneExistingBills.classList.remove('active');
+
+      // Direct to bill creation: if actively editing, open sheet; otherwise show 3-trader selection step
+      if (currentEditingBillId && currentActiveTrader) {
+        selectTrader(currentActiveTrader, true);
+      } else {
+        showTraderSelectionStep();
+      }
+    }
+  }
+
+  // Tab & Header Button Events
+  if (tabExistingBills) tabExistingBills.addEventListener('click', () => switchTab('existing'));
+  if (tabCreateBill) tabCreateBill.addEventListener('click', () => switchTab('create'));
+
+  const btnQuickNewBill = document.getElementById('btn-quick-new-bill');
+  if (btnQuickNewBill) {
+    btnQuickNewBill.addEventListener('click', () => {
+      currentEditingBillId = null;
+      switchTab('create');
+    });
+  }
+
+  const btnCreateFirstBill = document.getElementById('btn-create-first-bill');
+  if (btnCreateFirstBill) {
+    btnCreateFirstBill.addEventListener('click', () => {
+      currentEditingBillId = null;
+      switchTab('create');
+    });
   }
 
   if (cardSelectVd) cardSelectVd.addEventListener('click', () => selectTrader('VISHNUDATTA COCONUT'));
@@ -211,6 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnChangeTrader) {
     btnChangeTrader.addEventListener('click', showTraderSelectionStep);
+  }
+
+  if (btnBackToExisting) {
+    btnBackToExisting.addEventListener('click', () => switchTab('existing'));
   }
 
   // ==========================================================
@@ -956,6 +983,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
 
+  // Wire Logout Button
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      const token = localStorage.getItem(STORAGE_TOKEN_KEY);
+      try {
+        const logoutEndpoint = window.COCO_CONFIG ? window.COCO_CONFIG.resolveUrl('/api/logout') : '/api/logout';
+        await fetch(logoutEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          }
+        });
+      } catch (e) {}
+
+      localStorage.removeItem(STORAGE_USER_KEY);
+      localStorage.removeItem(STORAGE_TOKEN_KEY);
+      window.location.replace('index.html?logged_out=1');
+    });
+  }
+
   // Initial setup
   renderBillsTable();
+
+  // Check URL params for direct tab navigation (e.g. ?tab=create)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'create') {
+    switchTab('create');
+  }
 });

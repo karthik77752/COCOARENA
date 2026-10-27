@@ -17,7 +17,10 @@ VISHNUDATTA/
 │   │   └── js/                  # docx.umd.js, html2pdf.bundle.min.js
 │   ├── index.html               # Sign In / Landing Page
 │   ├── dashboard.html           # Full Multi-Trader Coconut Billing Dashboard
-│   ├── register.html            # User Registration Page
+│   ├── register.html            # User Registration Page (Seamless mobile-optimized without captcha)
+│   ├── admin.html               # Executive Admin Console (Restricted to Admin Karthik)
+│   ├── admin.css                # Admin console styling & live data tables
+│   ├── admin.js                 # Admin live credentials audit & user management
 │   ├── styles.css               # Core design tokens, typography, auth styles
 │   ├── dashboard.css            # Billing table styles, print sheets, templates
 │   ├── app.js                   # Authentication & language switching
@@ -29,7 +32,8 @@ VISHNUDATTA/
 ├── backend/                      # Server-side logic & persistence
 │   ├── data/
 │   │   ├── bills.json           # Stored bills database
-│   │   └── users.json           # Registered users database
+│   │   ├── users.json           # Registered users database
+│   │   └── logins.json          # Live login events & credentials audit log
 │   └── server.js                # Node.js HTTP server & API endpoints
 │
 └── package.json                 # Project configuration & start scripts

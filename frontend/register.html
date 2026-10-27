@@ -165,33 +165,9 @@
             </div>
           </div>
 
-          <!-- Captcha -->
-          <div class="form-group captcha-group">
-            <label for="reg-captcha-input" class="form-label" id="label-reg-captcha">Security Captcha Verification</label>
-            <div class="captcha-flex-wrapper">
-              <div class="captcha-preview-box">
-                <canvas id="captcha-canvas" width="160" height="44"></canvas>
-                <button type="button" class="btn-refresh-captcha" id="btn-refresh-captcha" title="Refresh Captcha">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M23 4v6h-6"></path>
-                    <path d="M1 20v-6h6"></path>
-                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                  </svg>
-                </button>
-              </div>
-              <div class="input-container captcha-input-box">
-                <input 
-                  type="text" 
-                  id="reg-captcha-input" 
-                  class="form-input captcha-input" 
-                  placeholder="Code" 
-                  maxlength="6" 
-                  autocomplete="off"
-                  required
-                >
-              </div>
-            </div>
-          </div>
+          <!-- Anti-Bot Security Protection (Invisible Honeypot & Timestamp) -->
+          <input type="text" name="website_hp" id="reg-website-hp" class="hp-input" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
+          <input type="hidden" name="formRenderTime" id="form-render-time" value="">
 
           <!-- Submit Button -->
           <button type="submit" class="btn-auth-submit" id="btn-register-submit">

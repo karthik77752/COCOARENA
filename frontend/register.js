@@ -11,13 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const regUsername = document.getElementById('reg-username');
   const regPassword = document.getElementById('reg-password');
   const regConfirmPass = document.getElementById('reg-confirm-password');
-  const regCaptchaInput = document.getElementById('reg-captcha-input');
-  const btnRefreshCaptcha = document.getElementById('btn-refresh-captcha');
-  const captchaCanvas = document.getElementById('captcha-canvas');
+  const regWebsiteHp = document.getElementById('reg-website-hp');
+  const formRenderTimeInput = document.getElementById('form-render-time');
   const btnRegisterSubmit = document.getElementById('btn-register-submit');
   const toastContainer = document.getElementById('toast-container');
 
-  let currentCaptcha = '';
+  // Record form render timestamp for anti-bot timing check
+  const formLoadTime = Date.now();
+  if (formRenderTimeInput) {
+    formRenderTimeInput.value = formLoadTime.toString();
+  }
 
   // Storage key
   const STORAGE_KEY = 'vishnudatta_coconut_users';
@@ -25,104 +28,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function getStoredAccounts() {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) {
-        const defaultAccounts = [
-          {
-            fullname: 'Akkireddy Subrahmanyam',
-            phone: '9440217789',
-            username: 'subrahmanyam',
-            password: 'konaseema'
-          }
-        ];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultAccounts));
-        return defaultAccounts;
-      }
-      return JSON.parse(data);
+      return data ? JSON.parse(data) : [];
     } catch (e) {
       return [];
     }
   }
 
-  function saveAccounts(accounts) {
+  function saveLocalAccounts(accounts) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
     } catch (e) {
       console.error('Failed to save to localStorage', e);
     }
-    const usersEndpoint = window.COCO_CONFIG ? window.COCO_CONFIG.resolveUrl('/api/users') : '/api/users';
-    if (usersEndpoint) {
-      fetch(usersEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(accounts)
-      }).catch(() => {});
-    }
-  }
-
-  // Captcha Generator
-  function generateCaptchaCode(length = 5) {
-    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-    let code = '';
-    for (let i = 0; i < length; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return code;
-  }
-
-  function renderCaptcha() {
-    if (!captchaCanvas) return;
-    const ctx = captchaCanvas.getContext('2d');
-    const width = captchaCanvas.width;
-    const height = captchaCanvas.height;
-
-    currentCaptcha = generateCaptchaCode(5);
-
-    // Canvas Background
-    ctx.fillStyle = '#03140c';
-    ctx.fillRect(0, 0, width, height);
-
-    // Noise Lines
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath();
-      ctx.moveTo(Math.random() * width, Math.random() * height);
-      ctx.lineTo(Math.random() * width, Math.random() * height);
-      ctx.strokeStyle = 'rgba(212, 163, 65, 0.35)';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-    }
-
-    // Characters
-    const spacing = width / (currentCaptcha.length + 1);
-    ctx.font = 'bold 22px "Courier New", monospace';
-    ctx.textBaseline = 'middle';
-
-    const colors = ['#fae4a8', '#34d399', '#f3cf7a', '#6ee7b7', '#fcd34d'];
-
-    for (let i = 0; i < currentCaptcha.length; i++) {
-      const char = currentCaptcha[i];
-      ctx.save();
-      const x = (i + 0.8) * spacing;
-      const y = height / 2 + (Math.random() * 4 - 2);
-      const angle = (Math.random() * 0.3) - 0.15;
-      
-      ctx.translate(x, y);
-      ctx.rotate(angle);
-      ctx.fillStyle = colors[i % colors.length];
-      ctx.shadowColor = 'rgba(0,0,0,0.85)';
-      ctx.shadowBlur = 3;
-      ctx.fillText(char, -8, 0);
-      ctx.restore();
-    }
-
-    if (regCaptchaInput) {
-      regCaptchaInput.value = '';
-    }
-  }
-
-  if (btnRefreshCaptcha) {
-    btnRefreshCaptcha.addEventListener('click', () => {
-      renderCaptcha();
-    });
   }
 
   // Toast System
@@ -172,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Form Submit Handler
   if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
+    registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const lang = localStorage.getItem('vishnudatta_lang') || 'en';
@@ -181,9 +98,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const username = regUsername.value.trim();
       const password = regPassword.value.trim();
       const confirmPassword = regConfirmPass.value.trim();
-      const enteredCaptcha = regCaptchaInput.value.trim().toUpperCase();
+      const honeypot = regWebsiteHp ? regWebsiteHp.value.trim() : '';
 
-      // Validate empty fields
+      // 1. Anti-Bot Honeypot check
+      if (honeypot !== '') {
+        console.warn('Bot detected via honeypot.');
+        showToast('Registration error occurred.', 'error');
+        return;
+      }
+
+      // 2. Validate empty fields
       if (!fullname || !phone || !username || !password || !confirmPassword) {
         showToast(
           lang === 'te' ? 'దయచేసి అన్ని వివరాలను నమోదు చేయండి' : 'Please fill in all required fields',
@@ -192,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Validate Phone: 10 digits
+      // 3. Validate Phone: exactly 10 digits
       const phoneRegex = /^\d{10}$/;
       if (!phoneRegex.test(phone)) {
         showToast(
@@ -203,7 +127,27 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Validate Password length
+      // 4. Validate Username: 3-30 characters, alphanumeric
+      if (username.length < 3 || username.length > 30) {
+        showToast(
+          lang === 'te' ? 'యూజర్ నేమ్ 3 నుండి 30 అక్షరాలు ఉండాలి' : 'Username must be 3-30 characters long',
+          'error'
+        );
+        regUsername.focus();
+        return;
+      }
+
+      // 5. Check reserved admin username
+      if (username.toUpperCase() === 'KARTHIK') {
+        showToast(
+          lang === 'te' ? 'ఈ యూజర్ నేమ్ అనుమతించబడదు. వేరే పేరును ఎంచుకోండి.' : 'This username is reserved. Please choose another username.',
+          'error'
+        );
+        regUsername.focus();
+        return;
+      }
+
+      // 6. Validate Password length
       if (password.length < 6) {
         showToast(
           lang === 'te' ? 'పాస్‌వర్డ్ కనీసం 6 అక్షరాలు ఉండాలి' : 'Password must be at least 6 characters long',
@@ -213,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Validate Password matching
+      // 7. Validate Password matching
       if (password !== confirmPassword) {
         showToast(
           lang === 'te' ? 'పాస్‌వర్డ్ మరియు నిర్ధారణ పాస్‌వర్డ్ సరిపోలలేదు' : 'Passwords do not match! Please check again',
@@ -223,85 +167,114 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Captcha Verification
-      if (!enteredCaptcha) {
-        showToast(
-          lang === 'te' ? 'దయచేసి సెక్యూరిటీ క్యాప్చా నమోదు చేయండి' : 'Please enter the security captcha code',
-          'error'
-        );
-        regCaptchaInput.focus();
-        return;
-      }
-
-      if (enteredCaptcha !== currentCaptcha) {
-        showToast(
-          lang === 'te' ? 'క్యాప్చా సరిపోలలేదు! కొత్త కోడ్ ప్రయత్నించండి' : 'Incorrect captcha code! Please try the new code',
-          'error'
-        );
-        renderCaptcha();
-        regCaptchaInput.focus();
-        return;
-      }
-
-      // Check for duplicate accounts
-      const accounts = getStoredAccounts();
-      const existingUser = accounts.find(
-        acc => acc.username.toLowerCase() === username.toLowerCase() || acc.phone === phone
-      );
-
-      if (existingUser) {
-        if (existingUser.phone === phone) {
-          showToast(
-            lang === 'te' 
-              ? 'ఈ ఫోన్ నంబరుతో ఇప్పటికే ఖాతా ఉంది! దయచేసి లాగిన్ అవ్వండి.' 
-              : 'An account with this phone number already exists! Please sign in.',
-            'error'
-          );
-        } else {
-          showToast(
-            lang === 'te' 
-              ? 'ఈ యూజర్ నేమ్ ఇప్పటికే ఉపయోగంలో ఉంది. వేరే పేరును ఎంచుకోండి.' 
-              : 'This username is already taken. Please choose another username.',
-            'error'
-          );
-        }
-        renderCaptcha();
-        return;
-      }
-
-      // Save new user account
-      const newUser = {
+      // Prepare submission payload
+      const payload = {
         fullname,
         phone,
         username,
         password,
-        registeredAt: new Date().toISOString()
+        confirmPassword,
+        website_hp: honeypot,
+        formRenderTime: formLoadTime
       };
 
-      accounts.push(newUser);
-      saveAccounts(accounts);
-
-      // Disable button to prevent duplicate submission
+      // Set loading state on submit button
       if (btnRegisterSubmit) {
         btnRegisterSubmit.disabled = true;
         btnRegisterSubmit.style.opacity = '0.7';
+        btnRegisterSubmit.innerHTML = `<span class="btn-text">${lang === 'te' ? 'నమోదు అవుతోంది...' : 'REGISTERING...'}</span>`;
       }
 
-      showToast(
-        lang === 'te' 
-          ? `ఖాతా విజయవంతంగా నమోదయింది! లాగిన్ పేజీకి రీడైరెక్ట్ అవుతోంది...` 
-          : `Account registered successfully! Redirecting to Sign In...`,
-        'success',
-        3000
-      );
+      const registerEndpoint = window.COCO_CONFIG ? window.COCO_CONFIG.resolveUrl('/api/register') : '/api/register';
 
-      // Redirect to index.html with user param
-      setTimeout(() => {
-        window.location.href = `index.html?registered=1&user=${encodeURIComponent(phone)}`;
-      }, 1200);
+      try {
+        const response = await fetch(registerEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Sync with local storage
+          const localAccounts = getStoredAccounts();
+          localAccounts.push({
+            fullname,
+            phone,
+            username,
+            password,
+            registeredAt: new Date().toISOString()
+          });
+          saveLocalAccounts(localAccounts);
+
+          showToast(
+            lang === 'te' 
+              ? `ఖాతా విజయవంతంగా నమోదయింది! లాగిన్ పేజీకి రీడైరెక్ట్ అవుతోంది...` 
+              : `Account registered successfully! Redirecting to Sign In...`,
+            'success',
+            3000
+          );
+
+          setTimeout(() => {
+            window.location.href = `index.html?registered=1&user=${encodeURIComponent(phone)}`;
+          }, 1200);
+        } else {
+          // Server returned validation / duplicate error
+          const errMsg = data.error || (lang === 'te' ? 'రిజిస్ట్రేషన్ విఫలమైంది.' : 'Registration failed.');
+          showToast(errMsg, 'error', 4500);
+
+          if (btnRegisterSubmit) {
+            btnRegisterSubmit.disabled = false;
+            btnRegisterSubmit.style.opacity = '1';
+            btnRegisterSubmit.innerHTML = `<span class="btn-text" id="text-btn-register">${lang === 'te' ? 'ఇప్పుడే నమోదు అవ్వండి' : 'REGISTER NOW'}</span>`;
+          }
+        }
+      } catch (networkErr) {
+        console.warn('Network error reaching backend server, trying local fallback:', networkErr);
+
+        // Offline / Direct static fallback
+        const localAccounts = getStoredAccounts();
+        const existingUser = localAccounts.find(
+          acc => acc.username.toLowerCase() === username.toLowerCase() || acc.phone === phone
+        );
+
+        if (existingUser) {
+          showToast(
+            lang === 'te' 
+              ? 'ఈ ఫోన్ నంబర్ లేదా యూజర్ నేమ్‌తో ఇప్పటికే ఖాతా ఉంది!' 
+              : 'An account with this phone number or username already exists!',
+            'error'
+          );
+          if (btnRegisterSubmit) {
+            btnRegisterSubmit.disabled = false;
+            btnRegisterSubmit.style.opacity = '1';
+            btnRegisterSubmit.innerHTML = `<span class="btn-text">${lang === 'te' ? 'ఇప్పుడే నమోదు అవ్వండి' : 'REGISTER NOW'}</span>`;
+          }
+          return;
+        }
+
+        localAccounts.push({
+          fullname,
+          phone,
+          username,
+          password,
+          registeredAt: new Date().toISOString()
+        });
+        saveLocalAccounts(localAccounts);
+
+        showToast(
+          lang === 'te' 
+            ? `ఖాతా నమోదయింది! లాగిన్ పేజీకి రీడైరెక్ట్ అవుతోంది...` 
+            : `Account registered! Redirecting to Sign In...`,
+          'success',
+          2500
+        );
+
+        setTimeout(() => {
+          window.location.href = `index.html?registered=1&user=${encodeURIComponent(phone)}`;
+        }, 1000);
+      }
     });
   }
-
-  // Initial captcha render
-  renderCaptcha();
 });

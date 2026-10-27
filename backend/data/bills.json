@@ -1,1 +1,15 @@
-[]
+{
+  "billNo": "101",
+  "id": "bill_test_01",
+  "messers": "SRI RAMA TRADERS",
+  "createdAt": "2026-10-27T14:31:51.8713300+05:30",
+  "totalCoconuts": 12500,
+  "date": "27/10/2026",
+  "company": "VISHNUDATTA COCONUT",
+  "grandTotal": 187500,
+  "formData": {
+    "vd-messers": "SRI RAMA TRADERS",
+    "vd-date": "27/10/2026",
+    "vd-bill-no": "101"
+  }
+}

@@ -9,35 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginUsernameInput = document.getElementById('login-username');
   const loginPasswordInput = document.getElementById('login-password');
   const btnToggleLoginPass = document.getElementById('btn-toggle-login-pass');
+  const btnLoginSubmit = document.getElementById('btn-login-submit');
   const toastContainer = document.getElementById('toast-container');
 
-  // Local Storage Setup
-  const STORAGE_KEY = 'vishnudatta_coconut_users';
-  function getStoredAccounts() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      if (!data) {
-        const defaultAccounts = [
-          {
-            fullname: 'Akkireddy Subrahmanyam',
-            phone: '9440217789',
-            username: 'subrahmanyam',
-            password: 'konaseema'
-          }
-        ];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultAccounts));
-        return defaultAccounts;
-      }
-      return JSON.parse(data);
-    } catch (e) {
-      return [];
-    }
-  }
+  const STORAGE_USER_KEY = 'vishnudatta_active_user';
+  const STORAGE_TOKEN_KEY = 'vishnudatta_auth_token';
 
-  // Check URL params for registration redirect
+  // Check URL params for messages
   const urlParams = new URLSearchParams(window.location.search);
+  const lang = localStorage.getItem('vishnudatta_lang') || 'en';
+
   if (urlParams.get('registered') === '1') {
-    const lang = localStorage.getItem('vishnudatta_lang') || 'en';
     const msg = lang === 'te' 
       ? 'ఖాతా విజయవంతంగా నమోదయింది! దయచేసి లాగిన్ అవ్వండి.' 
       : 'Account registered successfully! Please sign in.';
@@ -47,8 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
       loginUsernameInput.value = userPhone;
       if (loginPasswordInput) loginPasswordInput.focus();
     }
+  } else if (urlParams.get('unauthorized') === '1') {
+    const msg = lang === 'te'
+      ? 'అనధికారిక ప్రవేశం నిషేధించబడింది! దయచేసి నమోదు చేసుకున్న ఖాతాతో లాగిన్ అవ్వండి.'
+      : 'Unauthorized access blocked! Please sign in with your registered account.';
+    showToast(msg, 'error', 5500);
+  } else if (urlParams.get('logged_out') === '1') {
+    const msg = lang === 'te'
+      ? 'లాగౌట్ విజయవంతమైంది.'
+      : 'Signed out successfully.';
+    showToast(msg, 'info', 3500);
   }
-
 
   // Password Visibility Toggle
   if (btnToggleLoginPass && loginPasswordInput) {
@@ -92,64 +83,127 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Form Submit Handler
   if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const userOrPhone = loginUsernameInput.value.trim();
       const password = loginPasswordInput.value.trim();
-      const lang = localStorage.getItem('vishnudatta_lang') || 'en';
+      const currentLang = localStorage.getItem('vishnudatta_lang') || 'en';
 
       if (!userOrPhone || !password) {
-        showToast(lang === 'te' ? 'యూజర్ నేమ్ మరియు పాస్‌వర్డ్ నమోదు చేయండి' : 'Please enter Username/Phone and Password', 'error');
+        showToast(
+          currentLang === 'te' ? 'యూజర్ నేమ్ మరియు పాస్‌వర్డ్ నమోదు చేయండి' : 'Please enter Username/Phone and Password', 
+          'error'
+        );
         return;
       }
 
-      // Check credentials
-      // Sync accounts from disk if available
-    const usersEndpoint = window.COCO_CONFIG ? window.COCO_CONFIG.resolveUrl('/api/users') : '/api/users';
-    if (usersEndpoint) {
-      fetch(usersEndpoint)
-        .then(res => res.json())
-        .then(remote => {
-          if (Array.isArray(remote) && remote.length > 0) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+      // UI Loading state
+      if (btnLoginSubmit) {
+        btnLoginSubmit.disabled = true;
+        btnLoginSubmit.style.opacity = '0.7';
+        btnLoginSubmit.innerHTML = `<span class="btn-text">${currentLang === 'te' ? 'ధృవీకరిస్తోంది...' : 'AUTHENTICATING...'}</span>`;
+      }
+
+      const loginEndpoint = window.COCO_CONFIG ? window.COCO_CONFIG.resolveUrl('/api/login') : '/api/login';
+
+      try {
+        const response = await fetch(loginEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: userOrPhone,
+            password: password
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Store session token and user details
+          localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(data.user));
+          if (data.token) {
+            localStorage.setItem(STORAGE_TOKEN_KEY, data.token);
           }
-        }).catch(() => {});
-    }
-    const accounts = getStoredAccounts();
-      const found = accounts.find(
-        acc => (acc.username.toLowerCase() === userOrPhone.toLowerCase() || acc.phone === userOrPhone) && 
-               acc.password === password
-      );
 
-      if (found) {
-        // Save active user session
-        const sessionUser = {
-          fullname: found.fullname,
-          phone: found.phone,
-          username: found.username,
-          loginTime: new Date().toISOString()
-        };
-        try {
-          localStorage.setItem('vishnudatta_active_user', JSON.stringify(sessionUser));
-        } catch (e) {
-          console.error('Failed to store active user', e);
+          // Check if Admin login or Regular User login
+          if (data.role === 'admin' || (data.user && data.user.role === 'admin')) {
+            // Admin authorization granted
+            showToast(
+              currentLang === 'te' 
+                ? 'అడ్మిన్ అనుమతి మంజూరు చేయబడింది! అడ్మిన్ కన్సోల్‌కు వెళ్తున్నారు...' 
+                : 'Admin authorization granted! Redirecting to Admin Console...',
+              'success',
+              2500
+            );
+
+            setTimeout(() => {
+              window.location.href = 'admin.html';
+            }, 800);
+          } else {
+            // Regular Registered User login
+            const welcomeMsg = currentLang === 'te' 
+              ? `స్వాగతం, ${data.user.fullname}! డ్యాష్‌బోర్డ్‌కు వెళ్తున్నారు...` 
+              : `Welcome, ${data.user.fullname}! Redirecting to Dashboard...`;
+            showToast(welcomeMsg, 'success', 2500);
+
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 800);
+          }
+        } else {
+          // Authentication Denied (Unauthorized random details or invalid password)
+          const errorMsg = data.error || (currentLang === 'te' 
+            ? 'వివరాలు సరిపోలలేదు. రిజిస్టర్ అయిన వినియోగదారులు మాత్రమే లాగిన్ అవ్వగలరు.' 
+            : 'Access Denied: Only registered users are permitted to log in. Please register first.');
+          showToast(errorMsg, 'error', 4500);
+
+          if (btnLoginSubmit) {
+            btnLoginSubmit.disabled = false;
+            btnLoginSubmit.style.opacity = '1';
+            btnLoginSubmit.innerHTML = `<span class="btn-text" id="text-btn-login">${currentLang === 'te' ? 'లాగిన్ అవ్వండి' : 'SIGN IN'}</span>`;
+          }
         }
+      } catch (networkErr) {
+        console.warn('Network issue connecting to server, checking local session cache:', networkErr);
+        // Fallback for offline capacitor app if server cannot be contacted
+        const localAccounts = JSON.parse(localStorage.getItem('vishnudatta_coconut_users') || '[]');
+        const found = localAccounts.find(
+          acc => (acc.username.toLowerCase() === userOrPhone.toLowerCase() || acc.phone === userOrPhone) && 
+                 acc.password === password
+        );
 
-        const welcomeMsg = lang === 'te' 
-          ? `స్వాగతం, ${found.fullname}! డ్యాష్‌బోర్డ్‌కు వెళ్తున్నారు...` 
-          : `Welcome, ${found.fullname}! Redirecting to Dashboard...`;
-        showToast(welcomeMsg, 'success', 3000);
-        loginForm.reset();
-
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 800);
-      } else {
-        const errorMsg = lang === 'te' 
-          ? 'వివరాలు సరిపోలలేదు. దయచేసి చెక్ చేయండి లేదా క్రింద రిజిస్టర్ అవ్వండి.' 
-          : 'Invalid login details. Please check your credentials or register below.';
-        showToast(errorMsg, 'error', 4500);
+        if (found) {
+          const sessionUser = {
+            fullname: found.fullname,
+            phone: found.phone,
+            username: found.username,
+            role: 'user',
+            loginTime: new Date().toISOString()
+          };
+          localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(sessionUser));
+          showToast(
+            currentLang === 'te' ? `స్వాగతం, ${found.fullname}!` : `Welcome, ${found.fullname}!`,
+            'success',
+            2500
+          );
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 800);
+        } else {
+          showToast(
+            currentLang === 'te' 
+              ? 'అనధికార ప్రవేశం తిరస్కరించబడింది. దయచేసి రిజిస్టర్ అవ్వండి.' 
+              : 'Access Denied: Only registered users are permitted to log in. Please register first.',
+            'error',
+            4500
+          );
+          if (btnLoginSubmit) {
+            btnLoginSubmit.disabled = false;
+            btnLoginSubmit.style.opacity = '1';
+            btnLoginSubmit.innerHTML = `<span class="btn-text">${currentLang === 'te' ? 'లాగిన్ అవ్వండి' : 'SIGN IN'}</span>`;
+          }
+        }
       }
     });
   }
